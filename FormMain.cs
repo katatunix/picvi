@@ -24,7 +24,7 @@ namespace picvi
 			Rectangle wa = Screen.PrimaryScreen.WorkingArea;
 			
 			Size maxInitPicSize = new Size(wa.Width - border.Width, wa.Height - border.Height);
-			m_pic = new MyPictureBox(m_path, maxInitPicSize, this, this.pic_Resize);
+			m_pic = new MyPictureBox(m_path, maxInitPicSize, this);
 			panel.Controls.Add(m_pic);
 
 			m_pic.loadImage();
@@ -32,64 +32,81 @@ namespace picvi
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
+			bool handled = false;
+
 			switch (keyData)
 			{
 				case Keys.Escape:
 					this.Close();
-					return true;
+					handled = true;
+					break;
 
 				case Keys.PageDown:
 					m_pic.zoomIn();
-					return true;
+					handled = true;
+					break;
 				case Keys.PageUp:
 					m_pic.zoomOut();
-					return true;
+					handled = true;
+					break;
 				case Keys.Home:
 					m_pic.zoomReset();
-					return true;
+					handled = true;
+					break;
 
 				case Keys.A:
 					m_pic.moveLeft();
-					return true;
+					handled = true;
+					break;
 				case Keys.D:
 					m_pic.moveRight();
-					return true;
+					handled = true;
+					break;
 				case Keys.Up: case Keys.W:
 					m_pic.moveUp();
-					return true;
+					handled = true;
+					break;
 				case Keys.Down: case Keys.S:
 					m_pic.moveDown();
-					return true;
+					handled = true;
+					break;
 
 				case Keys.Right:
 					m_pic.next();
-					return true;
+					handled = true;
+					break;
 				case Keys.Left:
 					m_pic.prev();
-					return true;
+					handled = true;
+					break;
 
 				case Keys.M:
 					m_pic.toogleMode();
 					m_curMode = (m_curMode + 1) % m_modes.Length;
-					showTitle();
-					return true;
+					handled = true;
+					break;
 				
 				case Keys.H:
 					showHelp();
-					return true;
+					handled = true;
+					break;
 			}
 
-			return false;
+			if (handled) showTitle();
+
+			return handled;
 		}
 
-		private void panel_Resize(object sender, EventArgs e)
+		private void panel_SizeChanged(object sender, EventArgs e)
 		{
 			centralizePictureBox();
 		}
 
-		private void pic_Resize(object sender, EventArgs e)
+		public void onPicSizeChanged()
 		{
-			SetClientSizeCore(m_pic.Width, m_pic.Height);
+			SetClientSizeCore(m_pic.Width, m_pic.Height); // this will raise panel_SizeChanged() also???? NO
+			
+			centralizePictureBox();
 			centralizeWindow();
 		}
 
@@ -118,13 +135,15 @@ namespace picvi
 
 		private void showHelp()
 		{
-			String content = "Zoom: PageUp, PageDown, Home\n"
-				+ "Position: W A S D Up Down\n"
-				+ "Next/Prev: Left Right";
-			MessageBox.Show(this, content, "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			String content =
+				"Zoom\t\tPageUp PageDown Home\n"
+				+ "Position\t\tW A S D Up Down\n"
+				+ "Next/Prev\t\tLeft Right\n"
+				+ "Mode\t\tM";
+			MessageBox.Show(this, content, "picvi (c) 2015 katatunix@gmail.com", MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 
-		public void onNew(String title)
+		public void onNewImage(String title)
 		{
 			m_curPicTitle = title;
 			showTitle();

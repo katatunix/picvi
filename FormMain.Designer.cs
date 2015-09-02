@@ -40,7 +40,7 @@
 			this.panel.Name = "panel";
 			this.panel.Size = new System.Drawing.Size(778, 569);
 			this.panel.TabIndex = 0;
-			this.panel.Resize += new System.EventHandler(this.panel_Resize);
+			this.panel.SizeChanged += new System.EventHandler(this.panel_SizeChanged);
 			// 
 			// FormMain
 			// 

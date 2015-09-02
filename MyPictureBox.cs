@@ -16,7 +16,7 @@ namespace picvi
 		private Size m_maxInitSize;
 		private bool m_isMangaMode;
 
-		public MyPictureBox(String path, Size maxInitSize, Observer observer, EventHandler resizeHandler)
+		public MyPictureBox(String path, Size maxInitSize, Observer observer)
 		{
 			this.SizeMode = PictureBoxSizeMode.StretchImage;
 			this.Image = null;
@@ -24,7 +24,6 @@ namespace picvi
 			m_maxInitSize = maxInitSize;
 			m_isMangaMode = true;
 			m_observer = observer;
-			this.Resize += new System.EventHandler(resizeHandler);
 
 			loadFiles(path);
 			findIndex(path);
@@ -106,7 +105,6 @@ namespace picvi
 				throw new Exception("Could not load the file " + path);
 			}
 
-			this.Left = this.Top = 0;
 			if (!m_isMangaMode)
 			{
 				m_ratio = 1.0f;
@@ -125,7 +123,7 @@ namespace picvi
 				}
 			}
 
-			m_observer.onNew(Path.GetFileName(path) + '/' + m_files.Count);
+			m_observer.onNewImage(Path.GetFileName(path) + '/' + m_files.Count);
 			zoom();
 		}
 
@@ -153,6 +151,7 @@ namespace picvi
 		private void zoom()
 		{
 			this.Size = new Size((int)(this.Image.Width * m_ratio), (int)(this.Image.Height * m_ratio));
+			m_observer.onPicSizeChanged();
 		}
 
 		public float getRatio()

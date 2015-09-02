@@ -54,7 +54,7 @@ namespace picvi
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
 			const float ZOOM = 0.02f;
-			const int MOVE = 20;
+			const int MOVE = 40;
 
 			switch (keyData)
 			{

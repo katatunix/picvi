@@ -10,11 +10,14 @@ namespace picvi
 		private String m_path;
 		private Image m_image;
 		private List<String> m_files;
+		private Observer m_observer;
 
-		public Pic(String path)
+		public Pic(String path, Observer observer)
 		{
 			m_path = path;
+			m_observer = observer;
 			m_image = null;
+
 			loadFiles();
 			loadImage();
 		}
@@ -31,16 +34,6 @@ namespace picvi
 					m_files.Add(path);
 				}
 			}
-		}
-
-		public Image image()
-		{
-			return m_image;
-		}
-
-		public String title()
-		{
-			return Path.GetFileName(m_path) + '/' + m_files.Count;
 		}
 
 		public void next()
@@ -82,6 +75,7 @@ namespace picvi
 				m_image = null;
 			}
 			m_image = Image.FromFile(m_path);
+			m_observer.onNew(m_image, Path.GetFileName(m_path) + '/' + m_files.Count);
 		}
 	}
 }

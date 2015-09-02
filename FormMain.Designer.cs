@@ -37,6 +37,7 @@
 			// 
 			// panel
 			// 
+			this.panel.BackColor = System.Drawing.SystemColors.Control;
 			this.panel.Controls.Add(this.pictureBox);
 			this.panel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panel.Location = new System.Drawing.Point(0, 0);

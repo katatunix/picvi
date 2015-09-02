@@ -76,11 +76,11 @@ namespace picvi
 					return true;
 
 				case Keys.A:
-					m_left -= MOVE;
+					m_left += MOVE;
 					applyPosition();
 					return true;
 				case Keys.D:
-					m_left += MOVE;
+					m_left -= MOVE;
 					applyPosition();
 					return true;
 				case Keys.Up: case Keys.W:

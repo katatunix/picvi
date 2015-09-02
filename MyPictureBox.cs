@@ -12,7 +12,7 @@ namespace picvi
 		private List<String> m_files;
 		private int m_index;
 		private Observer m_observer;
-		private float m_ratio;
+		private double m_ratio;
 		private Size m_maxInitSize;
 		private bool m_isMangaMode;
 
@@ -20,7 +20,7 @@ namespace picvi
 		{
 			this.SizeMode = PictureBoxSizeMode.StretchImage;
 			this.Image = null;
-			m_ratio = 1.0f;
+			m_ratio = 1.0;
 			m_maxInitSize = maxInitSize;
 			m_isMangaMode = true;
 			m_observer = observer;
@@ -65,6 +65,7 @@ namespace picvi
 			try
 			{
 				Image img = Image.FromFile(path);
+				#region orientation
 				if (Array.IndexOf(img.PropertyIdList, 274) > -1)
 				{
 					var orientation = (int) img.GetPropertyItem(274).Value[0];
@@ -98,6 +99,7 @@ namespace picvi
 					// This EXIF data is now invalid and should be removed.
 					img.RemovePropertyItem(274);
 				}
+				#endregion
 				this.Image = img;
 			}
 			catch (Exception)
@@ -107,7 +109,7 @@ namespace picvi
 
 			if (!m_isMangaMode)
 			{
-				m_ratio = 1.0f;
+				m_ratio = 1.0;
 			}
 
 			bool overWidth = (int)(this.Image.Width * m_ratio) > m_maxInitSize.Width;
@@ -116,10 +118,10 @@ namespace picvi
 				overWidth || (int)(this.Image.Height * m_ratio) > m_maxInitSize.Height;
 			if (overSize)
 			{
-				m_ratio = 1.0f * m_maxInitSize.Width / this.Image.Width;
+				m_ratio = (double) m_maxInitSize.Width / (double) this.Image.Width;
 				if (!m_isMangaMode)
 				{
-					m_ratio = Math.Min(m_ratio, 1.0f * m_maxInitSize.Height / this.Image.Height);
+					m_ratio = Math.Min(m_ratio, (double) m_maxInitSize.Height / (double) this.Image.Height);
 				}
 			}
 
@@ -132,7 +134,7 @@ namespace picvi
 			m_isMangaMode = !m_isMangaMode;
 		}
 
-		private const float ZOOM_STEP = 0.05f;
+		private const double ZOOM_STEP = 0.05;
 		public void zoomIn()
 		{
 			m_ratio += ZOOM_STEP;
@@ -145,7 +147,7 @@ namespace picvi
 		}
 		public void zoomReset()
 		{
-			m_ratio = 1.0f;
+			m_ratio = 1.0;
 			zoom();
 		}
 		private void zoom()
@@ -154,7 +156,7 @@ namespace picvi
 			m_observer.onPicSizeChanged();
 		}
 
-		public float getRatio()
+		public double getRatio()
 		{
 			return m_ratio;
 		}

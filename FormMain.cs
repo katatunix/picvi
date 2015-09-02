@@ -7,9 +7,10 @@ namespace picvi
 	public partial class FormMain : Form, Observer
 	{
 		private String m_path;
-		private Pic m_pic;
-		private float m_zoom;
-		private int m_picLeft, m_picTop;
+		private MyPictureBox m_pic;
+		private String[] m_modes = { "manga", "pic" };
+		private int m_curMode = 0;
+		private String m_curPicTitle = "";
 
 		public FormMain(String path)
 		{
@@ -19,20 +20,18 @@ namespace picvi
 
 		private void FormMain_Load(object sender, EventArgs e)
 		{
-			m_zoom = 1.0f;
-			m_pic = new Pic(m_path, this);
-		}
+			Size border = this.SizeFromClientSize(new Size(0, 0));
+			Rectangle wa = Screen.PrimaryScreen.WorkingArea;
+			
+			Size maxInitPicSize = new Size(wa.Width - border.Width, wa.Height - border.Height);
+			m_pic = new MyPictureBox(m_path, maxInitPicSize, this, this.pic_Resize);
+			panel.Controls.Add(m_pic);
 
-		private void adjustPictureBoxPosition()
-		{
-			pictureBox.Location = new Point(m_picLeft, m_picTop);
+			m_pic.loadImage();
 		}
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			const float ZOOM = 0.03f;
-			const int MOVE = 40;
-
 			switch (keyData)
 			{
 				case Keys.Escape:
@@ -40,33 +39,26 @@ namespace picvi
 					return true;
 
 				case Keys.PageDown:
-					m_zoom += ZOOM;
-					centralizeAll();
+					m_pic.zoomIn();
 					return true;
 				case Keys.PageUp:
-					m_zoom -= ZOOM;
-					centralizeAll();
+					m_pic.zoomOut();
 					return true;
 				case Keys.Home:
-					m_zoom = 1.0f;
-					centralizeAll();
+					m_pic.zoomReset();
 					return true;
 
 				case Keys.A:
-					m_picLeft += MOVE;
-					adjustPictureBoxPosition();
+					m_pic.moveLeft();
 					return true;
 				case Keys.D:
-					m_picLeft -= MOVE;
-					adjustPictureBoxPosition();
+					m_pic.moveRight();
 					return true;
 				case Keys.Up: case Keys.W:
-					m_picTop += MOVE;
-					adjustPictureBoxPosition();
+					m_pic.moveUp();
 					return true;
 				case Keys.Down: case Keys.S:
-					m_picTop -= MOVE;
-					adjustPictureBoxPosition();
+					m_pic.moveDown();
 					return true;
 
 				case Keys.Right:
@@ -74,6 +66,12 @@ namespace picvi
 					return true;
 				case Keys.Left:
 					m_pic.prev();
+					return true;
+
+				case Keys.M:
+					m_pic.toogleMode();
+					m_curMode = (m_curMode + 1) % m_modes.Length;
+					showTitle();
 					return true;
 				
 				case Keys.H:
@@ -84,36 +82,25 @@ namespace picvi
 			return false;
 		}
 
-		private void FormMain_Resize(object sender, EventArgs e)
+		private void panel_Resize(object sender, EventArgs e)
 		{
-			// When window is resized, panel will be resized too
 			centralizePictureBox();
 		}
 
-		public void onNew(Image image, String title)
+		private void pic_Resize(object sender, EventArgs e)
 		{
-			pictureBox.Image = image;
-			this.Text = "[picvi © 2015 katatunix@gmail.com] Press H for help [" + title + "]";
-
-			centralizeAll();
-		}
-
-		private void centralizeAll()
-		{
-			zoomPictureBox();
-			centralizePictureBox();
-			SetClientSizeCore(pictureBox.Width, pictureBox.Height);
+			SetClientSizeCore(m_pic.Width, m_pic.Height);
 			centralizeWindow();
 		}
 
 		private void centralizePictureBox()
 		{
-			m_picLeft = (panel.Width - pictureBox.Width) / 2;
-			if (m_picLeft < 0) m_picLeft = 0;
-			m_picTop = (panel.Height - pictureBox.Height) / 2;
-			if (m_picTop < 0) m_picTop = 0;
+			int x = (panel.Width - m_pic.Width) / 2;
+			if (x < 0) x = 0;
+			int y = (panel.Height - m_pic.Height) / 2;
+			if (y < 0) y = 0;
 
-			pictureBox.Location = new Point(m_picLeft, m_picTop);
+			m_pic.Location = new Point(x, y);
 		}
 
 		private void centralizeWindow()
@@ -129,18 +116,26 @@ namespace picvi
 			this.Location = new Point(wa.X + x, wa.Y + y);
 		}
 
-		private void zoomPictureBox()
-		{
-			pictureBox.Width = (int)(pictureBox.Image.Width * m_zoom);
-			pictureBox.Height = (int)(pictureBox.Image.Height * m_zoom);
-		}
-
 		private void showHelp()
 		{
 			String content = "Zoom: PageUp, PageDown, Home\n"
 				+ "Position: W A S D Up Down\n"
 				+ "Next/Prev: Left Right";
 			MessageBox.Show(this, content, "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
+		}
+
+		public void onNew(String title)
+		{
+			m_curPicTitle = title;
+			showTitle();
+		}
+
+		private void showTitle()
+		{
+			this.Text = String.Format("picvi | {0} | {1} % | Press H for help | {2}",
+				m_modes[m_curMode],
+				(m_pic.getRatio() * 100).ToString("0.00"),
+				m_curPicTitle);
 		}
 
 	}

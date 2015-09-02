@@ -7,6 +7,6 @@ namespace picvi
 {
 	interface Observer
 	{
-		void onNew(Image image, String title);
+		void onNew(String title);
 	}
 }

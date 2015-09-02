@@ -30,29 +30,17 @@
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
 			this.panel = new System.Windows.Forms.Panel();
-			this.pictureBox = new System.Windows.Forms.PictureBox();
-			this.panel.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// panel
 			// 
 			this.panel.BackColor = System.Drawing.SystemColors.Control;
-			this.panel.Controls.Add(this.pictureBox);
 			this.panel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panel.Location = new System.Drawing.Point(0, 0);
 			this.panel.Name = "panel";
 			this.panel.Size = new System.Drawing.Size(778, 569);
 			this.panel.TabIndex = 0;
-			// 
-			// pictureBox
-			// 
-			this.pictureBox.Location = new System.Drawing.Point(0, 0);
-			this.pictureBox.Name = "pictureBox";
-			this.pictureBox.Size = new System.Drawing.Size(295, 207);
-			this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.pictureBox.TabIndex = 0;
-			this.pictureBox.TabStop = false;
+			this.panel.Resize += new System.EventHandler(this.panel_Resize);
 			// 
 			// FormMain
 			// 
@@ -65,9 +53,6 @@
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "picvi";
 			this.Load += new System.EventHandler(this.FormMain_Load);
-			this.Resize += new System.EventHandler(this.FormMain_Resize);
-			this.panel.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -75,7 +60,6 @@
 		#endregion
 
 		private System.Windows.Forms.Panel panel;
-		private System.Windows.Forms.PictureBox pictureBox;
 
 	}
 }

@@ -8,8 +8,6 @@ namespace picvi
 	{
 		private String m_path;
 		private MyPictureBox m_pic;
-		private String[] m_modes = { "manga", "pic" };
-		private int m_curMode = 0;
 		private String m_curPicTitle = "";
 
 		public FormMain(String path)
@@ -24,9 +22,10 @@ namespace picvi
 			Rectangle wa = Screen.PrimaryScreen.WorkingArea;
 			
 			Size maxInitPicSize = new Size(wa.Width - border.Width, wa.Height - border.Height);
-			m_pic = new MyPictureBox(m_path, maxInitPicSize, this);
-			panel.Controls.Add(m_pic);
+			String configFielPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/picvi.config";
+			m_pic = new MyPictureBox(m_path, new Config(configFielPath), maxInitPicSize, this);
 
+			panel.Controls.Add(m_pic);
 			m_pic.loadImage();
 		}
 
@@ -82,7 +81,6 @@ namespace picvi
 
 				case Keys.M:
 					m_pic.toogleMode();
-					m_curMode = (m_curMode + 1) % m_modes.Length;
 					handled = true;
 					break;
 				
@@ -152,7 +150,7 @@ namespace picvi
 		private void showTitle()
 		{
 			this.Text = String.Format("picvi | {0} | {1} % | Press H for help | {2}",
-				m_modes[m_curMode],
+				m_pic.modeName(),
 				(m_pic.getRatio() * 100).ToString("0.00"),
 				m_curPicTitle);
 		}

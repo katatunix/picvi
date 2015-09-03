@@ -1,3 +1,5 @@
 git add -Av .
-git commit -m Message
+set MSG=%1
+if "%MSG%"=="" set MSG=Message
+git commit -m %MSG%
 git push origin HEAD

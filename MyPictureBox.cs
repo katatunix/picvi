@@ -14,15 +14,15 @@ namespace picvi
 		private Observer m_observer;
 		private double m_ratio;
 		private Size m_maxInitSize;
-		private bool m_isMangaMode;
+		private Config m_config;
 
-		public MyPictureBox(String path, Size maxInitSize, Observer observer)
+		public MyPictureBox(String path, Config config, Size maxInitSize, Observer observer)
 		{
 			this.SizeMode = PictureBoxSizeMode.StretchImage;
 			this.Image = null;
 			m_ratio = 1.0;
 			m_maxInitSize = maxInitSize;
-			m_isMangaMode = true;
+			m_config = config;
 			m_observer = observer;
 
 			loadFiles(path);
@@ -107,19 +107,20 @@ namespace picvi
 				throw new Exception("Could not load the file " + path);
 			}
 
-			if (!m_isMangaMode)
+			bool isMangeMode = m_config.isMangaMode();
+			if (!isMangeMode)
 			{
 				m_ratio = 1.0;
 			}
 
 			bool overWidth = (int)(this.Image.Width * m_ratio) > m_maxInitSize.Width;
-			bool overSize = m_isMangaMode ?
+			bool overSize = isMangeMode ?
 				overWidth :
 				overWidth || (int)(this.Image.Height * m_ratio) > m_maxInitSize.Height;
 			if (overSize)
 			{
 				m_ratio = (double) m_maxInitSize.Width / (double) this.Image.Width;
-				if (!m_isMangaMode)
+				if (!isMangeMode)
 				{
 					m_ratio = Math.Min(m_ratio, (double) m_maxInitSize.Height / (double) this.Image.Height);
 				}
@@ -131,7 +132,7 @@ namespace picvi
 
 		public void toogleMode()
 		{
-			m_isMangaMode = !m_isMangaMode;
+			m_config.toggleMode();
 		}
 
 		private const double ZOOM_STEP = 0.05;
@@ -194,6 +195,11 @@ namespace picvi
 			m_index--;
 			if (m_index < 0) m_index = m_files.Count - 1;
 			loadImage();
+		}
+
+		public string modeName()
+		{
+			return m_config.isMangaMode() ? "manga" : "pic";
 		}
 	}
 }

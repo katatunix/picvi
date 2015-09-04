@@ -12,15 +12,19 @@ namespace picvi
 		private List<String> m_files;
 		private int m_index;
 		private Observer m_observer;
-		private double m_ratio;
 		private Size m_maxInitSize;
 		private Config m_config;
+		private double m_ratio;
+		private double m_actualRatio;
+
+		private const double ZOOM_DEFAULT = 1.0;
 
 		public MyPictureBox(String path, Config config, Size maxInitSize, Observer observer)
 		{
 			this.SizeMode = PictureBoxSizeMode.StretchImage;
 			this.Image = null;
-			m_ratio = 1.0;
+			m_ratio = ZOOM_DEFAULT;
+			m_actualRatio = m_ratio;
 			m_maxInitSize = maxInitSize;
 			m_config = config;
 			m_observer = observer;
@@ -65,41 +69,7 @@ namespace picvi
 			try
 			{
 				Image img = Image.FromFile(path);
-				#region orientation
-				if (Array.IndexOf(img.PropertyIdList, 274) > -1)
-				{
-					var orientation = (int) img.GetPropertyItem(274).Value[0];
-					switch (orientation)
-					{
-						case 1:
-							// No rotation required.
-							break;
-						case 2:
-							img.RotateFlip(RotateFlipType.RotateNoneFlipX);
-							break;
-						case 3:
-							img.RotateFlip(RotateFlipType.Rotate180FlipNone);
-							break;
-						case 4:
-							img.RotateFlip(RotateFlipType.Rotate180FlipX);
-							break;
-						case 5:
-							img.RotateFlip(RotateFlipType.Rotate90FlipX);
-							break;
-						case 6:
-							img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-							break;
-						case 7:
-							img.RotateFlip(RotateFlipType.Rotate270FlipX);
-							break;
-						case 8:
-							img.RotateFlip(RotateFlipType.Rotate270FlipNone);
-							break;
-					}
-					// This EXIF data is now invalid and should be removed.
-					img.RemovePropertyItem(274);
-				}
-				#endregion
+				rotate(img);
 				this.Image = img;
 			}
 			catch (Exception)
@@ -110,24 +80,62 @@ namespace picvi
 			bool isMangeMode = m_config.isMangaMode();
 			if (!isMangeMode)
 			{
-				m_ratio = 1.0;
+				m_ratio = ZOOM_DEFAULT;
 			}
+			m_actualRatio = m_ratio;
 
-			bool overWidth = (int)(this.Image.Width * m_ratio) > m_maxInitSize.Width;
+			bool overWidth = (int)(this.Image.Width * m_actualRatio) > m_maxInitSize.Width;
 			bool overSize = isMangeMode ?
 				overWidth :
-				overWidth || (int)(this.Image.Height * m_ratio) > m_maxInitSize.Height;
+				overWidth || (int)(this.Image.Height * m_actualRatio) > m_maxInitSize.Height;
 			if (overSize)
 			{
-				m_ratio = (double) m_maxInitSize.Width / (double) this.Image.Width;
+				m_actualRatio = (double)m_maxInitSize.Width / (double)this.Image.Width;
 				if (!isMangeMode)
 				{
-					m_ratio = Math.Min(m_ratio, (double) m_maxInitSize.Height / (double) this.Image.Height);
+					m_actualRatio = Math.Min(m_actualRatio, (double)m_maxInitSize.Height / (double)this.Image.Height);
 				}
 			}
 
 			m_observer.onNewImage(Path.GetFileName(path) + '/' + m_files.Count);
 			zoom();
+		}
+
+		private void rotate(Image img)
+		{
+			if (Array.IndexOf(img.PropertyIdList, 274) > -1)
+			{
+				var orientation = (int)img.GetPropertyItem(274).Value[0];
+				switch (orientation)
+				{
+					case 1:
+						// No rotation required.
+						break;
+					case 2:
+						img.RotateFlip(RotateFlipType.RotateNoneFlipX);
+						break;
+					case 3:
+						img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+						break;
+					case 4:
+						img.RotateFlip(RotateFlipType.Rotate180FlipX);
+						break;
+					case 5:
+						img.RotateFlip(RotateFlipType.Rotate90FlipX);
+						break;
+					case 6:
+						img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+						break;
+					case 7:
+						img.RotateFlip(RotateFlipType.Rotate270FlipX);
+						break;
+					case 8:
+						img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+						break;
+				}
+				// This EXIF data is now invalid and should be removed.
+				img.RemovePropertyItem(274);
+			}
 		}
 
 		public void toogleMode()
@@ -138,28 +146,31 @@ namespace picvi
 		private const double ZOOM_STEP = 0.05;
 		public void zoomIn()
 		{
-			m_ratio += ZOOM_STEP;
+			m_actualRatio += ZOOM_STEP;
+			m_ratio = m_actualRatio;
 			zoom();
 		}
 		public void zoomOut()
 		{
-			m_ratio -= ZOOM_STEP;
+			m_actualRatio -= ZOOM_STEP;
+			m_ratio = m_actualRatio;
 			zoom();
 		}
 		public void zoomReset()
 		{
-			m_ratio = 1.0;
+			m_actualRatio = ZOOM_DEFAULT;
+			m_ratio = m_actualRatio;
 			zoom();
 		}
 		private void zoom()
 		{
-			this.Size = new Size((int)(this.Image.Width * m_ratio), (int)(this.Image.Height * m_ratio));
+			this.Size = new Size((int)(this.Image.Width * m_actualRatio), (int)(this.Image.Height * m_actualRatio));
 			m_observer.onPicSizeChanged();
 		}
 
-		public double getRatio()
+		public double getActualRatio()
 		{
-			return m_ratio;
+			return m_actualRatio;
 		}
 
 		private const int MOVE_STEP = 40;

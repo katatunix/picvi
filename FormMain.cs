@@ -151,7 +151,7 @@ namespace picvi
 		{
 			this.Text = String.Format("picvi | {0} | {1} % | Press H for help | {2}",
 				m_pic.modeName(),
-				(m_pic.getRatio() * 100).ToString("0.00"),
+				(m_pic.getActualRatio() * 100).ToString("0.00"),
 				m_curPicTitle);
 		}
 

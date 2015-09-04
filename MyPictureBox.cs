@@ -68,9 +68,7 @@ namespace picvi
 			String path = m_files[m_index];
 			try
 			{
-				Image img = Image.FromFile(path);
-				rotate(img);
-				this.Image = img;
+				this.Image = loadImageWithCorrectOrientation(path);
 			}
 			catch (Exception)
 			{
@@ -101,11 +99,12 @@ namespace picvi
 			zoom();
 		}
 
-		private void rotate(Image img)
+		private Image loadImageWithCorrectOrientation(string path)
 		{
+			Image img = Image.FromFile(path);
 			if (Array.IndexOf(img.PropertyIdList, 274) > -1)
 			{
-				var orientation = (int)img.GetPropertyItem(274).Value[0];
+				var orientation = (int) img.GetPropertyItem(274).Value[0];
 				switch (orientation)
 				{
 					case 1:
@@ -136,6 +135,7 @@ namespace picvi
 				// This EXIF data is now invalid and should be removed.
 				img.RemovePropertyItem(274);
 			}
+			return img;
 		}
 
 		public void toogleMode()

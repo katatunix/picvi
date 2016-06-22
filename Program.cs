@@ -11,6 +11,8 @@ namespace picvi
 		[STAThread]
 		static void Main(String[] args)
 		{
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
 			if (args.Length == 0)
 			{
 				MessageBox.Show(
@@ -19,8 +21,6 @@ namespace picvi
 					MessageBoxButtons.OK, MessageBoxIcon.Information);
 				return;
 			}
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new FormMain(args[0]));
 		}
 	}

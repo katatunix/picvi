@@ -40,15 +40,15 @@ namespace picvi
 					handled = true;
 					break;
 
-				case Keys.PageDown:
+				case Keys.I:
 					m_pic.zoomIn();
 					handled = true;
 					break;
-				case Keys.PageUp:
+				case Keys.O:
 					m_pic.zoomOut();
 					handled = true;
 					break;
-				case Keys.Home:
+				case Keys.R:
 					m_pic.zoomReset();
 					handled = true;
 					break;
@@ -134,7 +134,7 @@ namespace picvi
 		private void showHelp()
 		{
 			String content =
-				"Zoom\t\tPageUp PageDown Home\n"
+				"Zoom\t\tO(ut) I(n) R(eset)\n"
 				+ "Position\t\tW A S D Up Down\n"
 				+ "Next/Prev\t\tLeft Right\n"
 				+ "Mode\t\tM";
